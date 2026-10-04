@@ -15,10 +15,13 @@ import {
 	type LineMaskAnimator,
 } from "./animation/index.ts";
 import { LineBrightness } from "./line-brightness.ts";
+import { applyRubySpacing } from "./ruby-spacing.ts";
 
 interface RealWord extends LyricWord {
 	mainElement: HTMLSpanElement;
 	subElements: HTMLSpanElement[];
+	/** 词内注音层，无注音时为 null */
+	rubyElement: HTMLSpanElement | null;
 	elementAnimations: Animation[];
 	width: number;
 	height: number;
@@ -281,6 +284,7 @@ export class LyricLineEl extends LyricLineBase {
 	private createWord(word: LyricWord, shouldEmphasize: boolean): RealWord {
 		const mainWordEl = document.createElement("span");
 		const subElements: HTMLSpanElement[] = [];
+		let rubyElement: HTMLSpanElement | null = null;
 		const romanWord = word.romanWord?.trim() ?? "";
 		const wordContainer = this.lineHasRubyWords
 			? document.createElement("span")
@@ -306,6 +310,7 @@ export class LyricLineEl extends LyricLineBase {
 			wordContainer.appendChild(wordTextContainer);
 			mainWordEl.appendChild(rubyWordEl);
 			mainWordEl.appendChild(wordContainer);
+			rubyElement = rubyWordEl;
 		}
 
 		const displayWord = word.word;
@@ -352,6 +357,7 @@ export class LyricLineEl extends LyricLineBase {
 			...word,
 			mainElement: mainWordEl,
 			subElements: subElements,
+			rubyElement,
 			elementAnimations: [
 				createFloatAnimation(mainWordEl, {
 					word: word,
@@ -524,6 +530,8 @@ export class LyricLineEl extends LyricLineBase {
 
 		const mainStyle = getComputedStyle(this.element.children[0]);
 
+		// 撑宽量必须先落盘再计宽：逐词遮罩按词宽累加推算位置
+		applyRubySpacing(this.splittedWords);
 		this.measureWords();
 		// 此时样式与布局已完成解析，读取副本的定位几何数据不会再次引发强制同步布局
 		this.brightness.captureGeometry(mainStyle);

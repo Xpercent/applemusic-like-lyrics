@@ -86,9 +86,10 @@
 		min-height: 1em;
 		font-size: 0.5em;
 		line-height: 1em;
-		/* 注音宽于基字时不参与整词计宽，假名溢出到单词自身遮罩预留的内边距里，
-		   避免撑开主歌词字与字之间的间距 */
-		width: 0;
+		/* 注音默认不参与整词计宽，假名溢出到单词自身遮罩预留的内边距里，避免撑开主歌词
+		   字与字之间的间距；相邻假名即将相撞时由测量写出撑宽量，让注音自行撑开 */
+		box-sizing: content-box;
+		width: var(--amll-lp-ruby-width, 0px);
 		overflow: visible;
 
 		& > span {
