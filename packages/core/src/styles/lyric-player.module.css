@@ -104,6 +104,12 @@
 		vertical-align: bottom;
 	}
 
+	/* 注音与相邻注音相撞时，由逐词测量流程挂上该类名，
+	   让该词退回整词计宽、把主歌词间距撑开，假名不再重叠 */
+	.rubySpaced .rubyWord {
+		width: auto;
+	}
+
 	.wordBody {
 		display: flex;
 		flex-direction: column;
